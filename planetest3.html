@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,height=device-height, minimum-scale=1.0,maximum-scale=1.0"
+    />
+    <style>
+      html {
+        width: 100%;
+        height: 100%;
+      }
+
+      body {
+        position: static;
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        overflow: hidden;
+        z-index: 1;
+      }
+
+      body div {
+        position: absolute;
+        bottom: 0%;
+        width: 100%;
+        height: 15%;
+        background-color: #1c1c1c;
+        z-index: 101;
+      }
+
+      body p {
+        position: absolute;
+        margin: 0%;
+        bottom: 10%;
+        left: 10%;
+        float: right;
+      }
+
+      .canvas2D {
+        position: static;
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        overflow: hidden;
+        z-index: 100;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!--three.js & ar.js & orbitcontrols.js インクルード-->
+    <script src="js/three.min.js"></script>
+    <script src="js/ar.js"></script>
+    <script src="js/TweenMax.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/planeAR.js"></script>
+    <script src="js/event.js"></script>
+
+    <div>
+      <p style="color:white;top:10%;margin: 0%;">1 x + 1 y + 1 z = 1</p>
+      <p>
+        <input type="button" value="grid:x-y" id="xygrid" />
+        <input type="button" value="grid:y-z" id="yzgrid" />
+        <input type="button" value="grid:x-z" id="xzgrid" />
+        <input type="button" value="grid消去" id="gridcancel" />
+      </p>
+    </div>
+    <canvas id="canvas2D"></canvas>
+  </body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        >
+        <meta
+            http-equiv="X-UA-Compatible"
+            content="ie=edge"
+        >
+        <title>Document</title>
+    </head>
+
+    <body>
+        <script src='three.min.js'></script>
+        <script src="ar.js"></script>
+        <script src="TweenMax.min.js"></script>
+        <script src="OrbitControls.js"></script>
+        <script>
+            //three.jsの各設定
+            var scene = new THREE.Scene();
+            var renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true,
+            });
+            renderer.setClearColor(new THREE.Color("black"), 0);
+            renderer.setSize(640, 480);
+            renderer.domElement.style.position = "absolute";
+            renderer.domElement.style.top = "0px";
+            renderer.domElement.style.left = "0px";
+            document.body.appendChild(renderer.domElement);
+            var onRenderFcts = [];
+
+            //カメラ作成
+            var camera = new THREE.Camera();
+            scene.add(camera);
+
+            //arToolkitSource
+            var source = new THREEx.ArToolkitSource({
+                sourceType: "webcam",
+            })
+            source.init(function onReady() //onReady関数
+            {
+                onResize();
+            })
+
+            // atToolkitContext
+            var context = new THREEx.ArToolkitContext({
+                cameraParametersUrl: "camera_para.dat",
+                detectionMode: "mono",
+                imageSmoothingEnabled: true,
+                maxDetectionRate: 30,
+                canvasWidth: source.parameters.sourceWidth,
+            })
+            context.init(function onCompleted()
+            {
+                camera.projectionMatrix.copy(context.getProjectionMatrix());
+            })
+            // update artoolkit on every frame
+            onRenderFcts.push(function ()
+            {
+                if (source.ready === false) return
+                context.update(source.domElement)
+            })
+
+            //リサイズ
+            window.addEventListener("resize", function ()
+            {
+                onResize()
+            })
+
+            function onResize()
+            {
+                source.onResizeElement()
+                source.copyElementSizeTo(renderer.domElement)
+                if (context.arController !== null)
+                {
+                    source.copyElementSizeTo(context.arController.canvas)
+                }
+            }
+
+            //////////////////////////////////////////////////////////////////////////////////
+            //		render the whole thing on the page
+            //////////////////////////////////////////////////////////////////////////////////
+            // render the scene
+            onRenderFcts.push(function ()
+            {
+                renderer.render(scene, camera);
+            })
+            // run the rendering loop
+            var lastTimeMsec = null
+            requestAnimationFrame(function animate(nowMsec)
+            {
+                // keep looping
+                requestAnimationFrame(animate);
+                // measure time
+                lastTimeMsec = lastTimeMsec || nowMsec - 1000 / 60
+                var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
+                lastTimeMsec = nowMsec
+                // call each update function
+                onRenderFcts.forEach(function (onRenderFct)
+                {
+                    onRenderFct(deltaMsec / 1000, nowMsec / 1000)
+                })
+            })
+
+            ////////////////////////////////////////////////////////////////////////////////
+            //          Create a ArMarkerControls
+            ////////////////////////////////////////////////////////////////////////////////
+
+            var markerRoot_Axis = new THREE.Group
+            var artoolkitMarker = new THREEx.ArMarkerControls(context, markerRoot_Axis, {
+                type: 'pattern',
+                patternUrl: 'patt.a'
+            })
+            // build a smoothedControls
+            var smoothedRoot_Axis = new THREE.Group()
+            scene.add(smoothedRoot_Axis)
+            var smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot_Axis, {
+                lerpPosition: 0.4,
+                lerpQuaternion: 0.3,
+                lerpScale: 1,
+            })
+            onRenderFcts.push(function (delta)
+            {
+                smoothedControls.update(markerRoot_Axis)
+            })
+            //////////////////////////////////////////////////////////////////////////////////
+            //		add an object in the scene
+            //////////////////////////////////////////////////////////////////////////////////
+            var lightobj = [];
+            var axisArray = [];
+            var object = [];
+
+            var markerScene = new THREE.Scene();
+            smoothedRoot_Axis.add(markerScene);
+
+            ////環境光表示
+            //平行光源
+            var light = new THREE.DirectionalLight(0xffffff);
+            light.position.set(0, 100, 0);
+            markerScene.add(light);
+            lightobj.push(light); //no0
+            //自然光
+            var ambient = new THREE.AmbientLight(0x666666);
+            markerScene.add(ambient);
+            lightobj.push(ambient); //no1
+            ////環境光表示（終）
+            var geo = new THREE.CubeGeometry(1, 1, 1);
+            var mat = new THREE.MeshNormalMaterial({
+                transparent: true,
+                opacity: 0.7,
+                side: THREE.DoubleSide
+            });
+            var box = new THREE.Mesh(geo, mat);
+            box.position.set(0, 0.5, 0);
+            markerScene.add(box);
+            object.push(box);
+
+            smoothedControls.addEventListener('becameVisible', function ()
+            {
+                TweenMax.fromTo(
+                    box.position,
+                    3,//秒数
+                    {
+                        x: -2
+                    },
+                    {
+                        x: 2,
+                        repeat: -1,
+                        yoyo: true
+                    }
+                );
+            })
+        </script>
+    </body>
+
+</html>

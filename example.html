@@ -1,0 +1,30 @@
+<!doctype HTML>
+<html>
+    <!-- A-Frameを読み込み -->
+    <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+    <!-- AR.jsを読み込み -->
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.6.2/aframe/build/aframe-ar.js"></script>
+
+    <body style="margin : 0px; overflow: hidden">
+        <!-- AR.jsのデバックとA-FrameのVRボタンを非表示 -->
+        <a-scene
+            embedded
+            arjs="debugUIEnabled: false"
+            vr-mode-ui="enabled: false"
+        >
+            <!-- a-markerのtypeにpatternを設定, 作ったpattファイルをurlにを指定 -->
+            <a-marker
+                type="pattern"
+                url="pattern/patt.a"
+            >
+                <a-image
+                    src="images/HML.jpg"
+                    opacity="0.5"
+                >
+                </a-image>
+            </a-marker>
+            <a-entity camera></a-entity>
+        </a-scene>
+    </body>
+
+</html>
