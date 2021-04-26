@@ -84,7 +84,7 @@ requestAnimationFrame(function animate(nowMsec) {
 var markerRoot_Axis = new THREE.Group();
 var artoolkitMarker = new THREEx.ArMarkerControls(context, markerRoot_Axis, {
   type: "pattern",
-  patternUrl: "pattern/patt.a"
+  patternUrl: "pattern/patt.hiro"
 });
 // build a smoothedControls
 var smoothedRoot_Axis = new THREE.Group();
